@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Task Manager</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <main class="app">
+    <header class="app__head">
+      <h1>Task Manager</h1>
+      <p id="ringkasan" class="ringkasan" aria-live="polite"></p>
+    </header>
+
+    <form id="form-tugas" class="form" autocomplete="off">
+      <label class="field field--judul">
+        <span>Judul tugas</span>
+        <input id="input-judul" type="text" maxlength="100" required placeholder="Contoh: Kerjakan laporan PABWE">
+      </label>
+      <label class="field">
+        <span>Prioritas</span>
+        <select id="input-prioritas">
+          <option value="rendah">Rendah</option>
+          <option value="sedang" selected>Sedang</option>
+          <option value="tinggi">Tinggi</option>
+        </select>
+      </label>
+      <label class="field">
+        <span>Tenggat</span>
+        <input id="input-tenggat" type="date">
+      </label>
+      <div class="form__aksi">
+        <button id="btn-simpan" type="submit" class="btn btn--utama">Tambah tugas</button>
+        <button id="btn-batal" type="button" class="btn" hidden>Batal</button>
+      </div>
+      <p id="pesan-error" class="error" role="alert" hidden></p>
+    </form>
+
+    <section class="toolbar" aria-label="Filter dan pencarian">
+      <div class="filter" role="group" aria-label="Filter status">
+        <button type="button" class="chip is-aktif" data-filter="semua">Semua</button>
+        <button type="button" class="chip" data-filter="aktif">Belum selesai</button>
+        <button type="button" class="chip" data-filter="selesai">Selesai</button>
+      </div>
+      <input id="input-cari" type="search" placeholder="Cari tugas…" aria-label="Cari tugas">
+    </section>
+
+    <ul id="daftar-tugas" class="daftar"></ul>
+    <p id="kosong" class="kosong" hidden></p>
+
+    <footer class="app__foot">
+      <button id="btn-hapus-selesai" type="button" class="btn btn--bahaya">Hapus semua yang selesai</button>
+    </footer>
+  </main>
+
+  <script src="app.js"></script>
+</body>
+</html>
