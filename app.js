@@ -22,10 +22,20 @@ const ringkasan = document.getElementById("ringkasan");
 const inputCari = document.getElementById("input-cari");
 
 // ---------- Penyimpanan ----------
+function dataTugasValid(t) {
+  return (
+    t !== null && typeof t === "object" &&
+    typeof t.id === "string" && typeof t.judul === "string" &&
+    ["rendah", "sedang", "tinggi"].includes(t.prioritas) &&
+    typeof t.selesai === "boolean" &&
+    (!t.tenggat || /^\d{4}-\d{2}-\d{2}$/.test(t.tenggat))
+  );
+}
+
 function muatTugas() {
   try {
     const data = JSON.parse(localStorage.getItem(STORAGE_KEY));
-    return Array.isArray(data) ? data : [];
+    return Array.isArray(data) ? data.filter(dataTugasValid) : [];
   } catch {
     return [];
   }
@@ -97,10 +107,16 @@ function formatTanggal(iso) {
   });
 }
 
+// Tanggal lokal (bukan UTC) dalam format YYYY-MM-DD
+function tanggalHariIni() {
+  const d = new Date();
+  const dua = (n) => String(n).padStart(2, "0");
+  return `${d.getFullYear()}-${dua(d.getMonth() + 1)}-${dua(d.getDate())}`;
+}
+
 function terlambat(t) {
   if (!t.tenggat || t.selesai) return false;
-  const hariIni = new Date().toISOString().slice(0, 10);
-  return t.tenggat < hariIni;
+  return t.tenggat < tanggalHariIni();
 }
 
 function buatTombol(teks, aksi, kelas = "btn") {
@@ -171,6 +187,7 @@ function render() {
 }
 
 function perbarui() {
+  tampilkanError("");
   simpanTugas();
   render();
 }
@@ -197,10 +214,19 @@ function keluarModeEdit() {
   tampilkanError("");
 }
 
+function resetTampilan() {
+  filterAktif = "semua";
+  kataKunci = "";
+  inputCari.value = "";
+  document.querySelectorAll(".chip").forEach((c) =>
+    c.classList.toggle("is-aktif", c.dataset.filter === "semua")
+  );
+}
+
 // ---------- Event ----------
 form.addEventListener("submit", (e) => {
   e.preventDefault();
-  const judul = inputJudul.value.trim();
+  const judul = inputJudul.value.trim().replace(/\s+/g, " ");
   const error = validasi(judul);
   if (error) return tampilkanError(error);
 
@@ -208,6 +234,7 @@ form.addEventListener("submit", (e) => {
     ubahTugas(idSedangDiedit, judul, inputPrioritas.value, inputTenggat.value);
   } else {
     tambahTugas(judul, inputPrioritas.value, inputTenggat.value);
+    resetTampilan();
   }
   keluarModeEdit();
   perbarui();
